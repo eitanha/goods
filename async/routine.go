@@ -5,20 +5,28 @@ import (
 	"github.com/eitanha/goods/void"
 )
 
-func Go[TValue any](fn func() TValue) Future[TValue] {
+type routineView[TValue any] struct {
+	Task[TValue]
+}
+
+func Go[TValue any](fn func() TValue) routineView[TValue] {
 	return GoFor(MakeTask[TValue](), fn)
 }
 
-type routineView[TValue any] struct {
-	Future[TValue]
-}
-
 func (r routineView[TValue]) Safely() Result[TValue] {
-	return Guard(r.Future)
+	return Guard(r)
 }
 
-func VoidGo(fn func()) Void {
-	return Go(void.Func(fn))
+type voidRoutineView struct {
+	Task[void.Type]
+}
+
+func VoidGo(fn func()) voidRoutineView {
+	return voidRoutineView{Go(void.Func(fn))}
+}
+
+func (r voidRoutineView) Safely() Error {
+	return GuardVoid(r)
 }
 
 func GoResult[TValue any](fn func() result.Result[TValue]) Result[TValue] {
@@ -29,12 +37,12 @@ func GoError(fn func() error) Error {
 	return GuardError(Go(fn))
 }
 
-func GoFor[TValue any](task Task[TValue], fn func() TValue) Task[TValue] {
+func GoFor[TValue any](task Task[TValue], fn func() TValue) routineView[TValue] {
 	go func() {
 		defer RecoverInto(task)
 		task.Set(fn())
 	}()
-	return task
+	return routineView[TValue]{task}
 }
 
 func GoAndRecover(fn func(), panicables ...Panicable) {

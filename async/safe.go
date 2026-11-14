@@ -2,6 +2,7 @@ package async
 
 import (
 	"github.com/eitanha/goods/result"
+	"github.com/eitanha/goods/void"
 )
 
 // Guard turns a Future[T] into a Result[T] that doesn't panic.
@@ -43,4 +44,24 @@ func (r *guardedError[T]) Await() error {
 	}, func(err error) error {
 		return err
 	})
+}
+
+func GuardVoid(future Void) Error {
+	return &guardedVoid{future}
+}
+
+type guardedVoid struct {
+	future Void
+}
+
+func (r *guardedVoid) Await() error {
+	return result.OkIfNotPanic(r.future.Await).Match(func(result void.Type) error {
+		return nil
+	}, func(err error) error {
+		return err
+	})
+}
+
+func (r *guardedVoid) Done() <-chan struct{} {
+	return r.future.Done()
 }
