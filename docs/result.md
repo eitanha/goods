@@ -20,7 +20,12 @@ if err := r.Err(); err != nil { … }
 ## Construct
 
 - `Ok(v)` — wrap a value.
+- `OkIfNotErr(v, err)` — lift a `(T, error)` pair (new in v0.1.5):
+  non-nil `err` → error result with it, otherwise `Ok(v)`.
 - `OkIfNotNil(ptr)` — wrap a pointer; nil → error state (`NoValueErr`).
+- `OkIfNotNilWithErr(ptr, err)` — pointer-or-error fallback (new in
+  v0.1.5): non-nil `ptr` wins and any `err` is ignored; nil `ptr` →
+  error result carrying `err` (`NoValueErr` when that is nil too).
 - `OkIfNotPanic(f)` — run `f`; a panic becomes an eris error
   ("recovered from panic: …") instead of unwinding.
 - `Err(err)` — error result; a nil `err` becomes `NoValueErr`.

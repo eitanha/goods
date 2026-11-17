@@ -6,16 +6,16 @@ Reference for [`github.com/eitanha/goods`](https://github.com/eitanha/goods)
 helpers, and a futures/workerpool kit.
 
 - Added to this module in v0.1.2 (2026-11-14); currently on
-  **v0.1.3** (2026-11-17). The module requires **go ≥ 1.27.4** (this is
+  **v0.1.5** (2026-11-17). The module requires **go ≥ 1.27.4** (this is
   what bumped `backend/go.mod` to 1.27.4).
 - Only transitive dependency: `github.com/rotisserie/eris` (error
   wrapping) — `result` errors are eris errors, so `Wrap`/`Wrapf` chains
   and `%+v` stacks work out of the box.
 - Import paths are the subpackages (`result`, `optional`, …), never the
   root — there is no root API.
-- Docs written from the v0.1.3 source; signatures are paraphrased, not
+- Docs written from the v0.1.5 source; signatures are paraphrased, not
   quoted. When in doubt, read the module cache:
-  `$(go env GOMODCACHE)/github.com/eitanha/goods@v0.1.3`.
+  `$(go env GOMODCACHE)/github.com/eitanha/goods@v0.1.5`.
 
 ## Package map
 
