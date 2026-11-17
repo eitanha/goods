@@ -1,6 +1,9 @@
 package after
 
-import "github.com/eitanha/goods/async"
+import (
+	"github.com/eitanha/goods/async"
+	"github.com/eitanha/goods/errorutils"
+)
 
 func Finishing[T any](futures async.Future[T]) afterFinishing[T] {
 	return afterFinishing[T]{futures}
@@ -31,11 +34,17 @@ func (c afterFinishing[T]) Catch(onPanic func(any)) afterFinishing[T] {
 	})
 }
 
-func (c afterFinishing[T]) Recover(recover func(any) T) afterFinishing[T] {
+func (c afterFinishing[T]) Recover(recover_ func(any) T) afterFinishing[T] {
 	task := async.MakeTask[T]()
-	return afterFinishing[T]{async.GoFor(&recoveringTask[T]{Task: task, fn: recover}, func() T {
+	return afterFinishing[T]{async.GoFor(&recoveringTask[T]{Task: task, fn: recover_}, func() T {
 		return c.Await()
 	})}
+}
+
+func (c afterFinishing[T]) RecoverError(recover_ func(error) T) afterFinishing[T] {
+	return c.Recover(func(p any) T {
+		return recover_(errorutils.FromPanic(p))
+	})
 }
 
 type recoveringTask[T any] struct {
