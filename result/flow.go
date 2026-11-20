@@ -9,7 +9,9 @@ func (r Result[T]) Do(f func(T)) Result[T] {
 	return r
 }
 
-var ErrFalsePredicate = eris.New("false predicate")
+func (r Result[T]) DoErr(f func(T) error) Result[T] {
+	return r.Validate(f)
+}
 
 func (r Result[T]) Validate(predicate func(T) error) Result[T] {
 	if r.IsOk() {
@@ -19,6 +21,8 @@ func (r Result[T]) Validate(predicate func(T) error) Result[T] {
 	}
 	return r
 }
+
+var ErrFalsePredicate = eris.New("false predicate")
 
 func (r Result[T]) Filter(predicate func(T) bool) Result[T] {
 	if r.IsOk() && !predicate(*r.value) {
@@ -75,6 +79,15 @@ func Flatten[T any](r Result[Result[T]]) Result[T] {
 	}
 
 	return Err[T](r.err)
+}
+
+func FlattenErr[T any](r Result[error]) error {
+	val, err := r.OrError()
+	if err != nil {
+		return err
+	}
+
+	return val
 }
 
 func (r Result[T]) Recover(f func(error) T) Result[T] {
