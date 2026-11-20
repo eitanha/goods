@@ -2,10 +2,11 @@ package result
 
 import "github.com/rotisserie/eris"
 
-func (r Result[T]) Do(f func(T)) {
+func (r Result[T]) Do(f func(T)) Result[T] {
 	if r.IsOk() {
 		f(*r.value)
 	}
+	return r
 }
 
 var ErrFalsePredicate = eris.New("false predicate")
